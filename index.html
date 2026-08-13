@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>EduPath AI</title>
+<style>
+:root{--bg:#08101e;--panel:#0f172a;--text:#e5e7eb;--muted:#9ca3af;--brand:#7c3aed;--brand2:#2563eb;--good:#10b981;--warn:#f59e0b;--risk:#ef4444;--radius:18px}
+*{box-sizing:border-box}body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.8;font-size:18px}
+.container{max-width:1160px;margin:0 auto;padding:0 24px}
+.panel{background:var(--panel);border:1px solid #1f2937;border-radius:var(--radius);padding:22px}
+.btn{padding:12px 18px;border-radius:12px;border:1px solid rgba(255,255,255,0.12);color:white;background:rgba(255,255,255,0.04);cursor:pointer;font-size:16px}
+.btn-primary{background:linear-gradient(135deg,var(--brand),var(--brand2));border-color:transparent}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:18px;padding:36px 0 20px 0}
+.hero h1{font-size:40px;margin:0 0 8px 0}
+.sub{font-size:20px;color:var(--muted)}
+input,select,textarea{width:100%;padding:14px 16px;border:1px solid #1f2937;border-radius:12px;background:#0b1224;color:var(--text);font-size:18px}
+label{display:block;margin-bottom:8px;color:var(--muted)}
+.sticky-banner{position:sticky;top:0;z-index:20;background:#0d1527fa;border-bottom:1px solid #1f2937;padding:12px 0}
+.topbar{display:flex;justify-content:space-between;align-items:center}
+.tag{display:inline-block;padding:5px 10px;border-radius:999px;font-size:14px;border:1px solid #1f2937}
+.tag.rush{color:var(--risk);border-color:#ef444455;background:#ef444412}.tag.match{color:var(--warn);border-color:#f59e0b55;background:#f59e0b12}.tag.safe{color:var(--good);border-color:#10b98155;background:#10b98112}
+table{width:100%;border-collapse:collapse}th,td{border:1px solid #1f2937;padding:12px;text-align:left;font-size:16px}
+.footer{padding:22px 0;border-top:1px solid #1f2937;color:var(--muted);text-align:center;margin-top:28px}
+.small{font-size:15px;color:var(--muted)}
+.actions{display:flex;gap:12px;flex-wrap:wrap}
+.card{padding:18px;background:#0b1224;border:1px solid #1f2937;border-radius:16px;margin-bottom:14px}
+.card strong{color:white}
+.counter{margin-top:12px;padding:14px;border:1px dashed #2563eb55;border-radius:16px;background:#2563eb12}
+</style>
+</head>
+<body>
+<div class="sticky-banner">
+  <div class="container topbar">
+    <div><strong id="t_compliance_title"></strong> <span id="t_compliance_text" class="small"></span></div>
+    <div class="actions">
+      <button class="btn" id="zhBtn">中文</button>
+      <button class="btn" id="enBtn">EN</button>
+      <a class="btn" href="#/admin-login" id="t_admin">管理后台 / Admin</a>
+    </div>
+  </div>
+</div>
+
+<main class="container" id="app"></main>
+<div class="footer"><div class="container">© 2026 EduPath AI · <span id="t_footer"></span></div></div>
+
+<script>
+const S='edupath_bilingual_v2';
+const DEFAULT_U=[
+  {id:'harvard',name_zh:'哈佛大学',name_en:'Harvard University',country:'US',gpa:3.9,ielts:7.5,acceptance_rate:4},
+  {id:'stanford',name_zh:'斯坦福大学',name_en:'Stanford University',country:'US',gpa:3.8,ielts:7.0,acceptance_rate:5},
+  {id:'columbia',name_zh:'哥伦比亚大学',name_en:'Columbia University',country:'US',gpa:3.7,ielts:7.0,acceptance_rate:8},
+  {id:'nyu',name_zh:'纽约大学',name_en:'New York University',country:'US',gpa:3.5,ielts:6.5,acceptance_rate:15},
+  {id:'ucla',name_zh:'加州大学洛杉矶分校',name_en:'UCLA',country:'US',gpa:3.4,ielts:6.5,acceptance_rate:18},
+  {id:'uiuc',name_zh:'伊利诺伊大学厄巴纳-香槟分校',name_en:'UIUC',country:'US',gpa:3.2,ielts:6.0,acceptance_rate:35},
+  {id:'oxford',name_zh:'牛津大学',name_en:'University of Oxford',country:'UK',gpa:3.8,ielts:7.5,acceptance_rate:6},
+  {id:'lse',name_zh:'伦敦政治经济学院',name_en:'London School of Economics',country:'UK',gpa:3.7,ielts:7.0,acceptance_rate:9},
+  {id:'ucl',name_zh:'伦敦大学学院',name_en:'University College London',country:'UK',gpa:3.5,ielts:6.5,acceptance_rate:16},
+  {id:'sydney',name_zh:'悉尼大学',name_en:'University of Sydney',country:'AU',gpa:3.2,ielts:6.5,acceptance_rate:30},
+  {id:'unsw',name_zh:'新南威尔士大学',name_en:'UNSW Sydney',country:'AU',gpa:3.0,ielts:6.0,acceptance_rate:40}
+];
+
+const T={
+  zh:{
+    compliance_title:'EU AI Act 高风险合规提示：',
+    compliance_text:'本系统用于高风险辅助决策，最终方案需人类专家复核确认。',
+    footer:'仅供课程演示用途',
+    h1:'AI 升学规划系统',
+    sub:'输入成绩与目标，系统会基于院校数据库生成三档方案草稿。',
+    name:'姓名',gpa:'GPA（0-4.0）',ielts:'雅思分数',country:'目标国家',country_opts:[['','不限'],['US','美国'],['UK','英国'],['AU','澳洲']],
+    gdpr:'我已阅读隐私与合规说明，并同意将以上信息用于升学诊断演示（GDPR 同意）。',
+    submit:'生成 AI 升学规划',admin_btn:'进入管理后台',
+    result_h:'AI 升学规划结果',counter_title:'反事实推演',counter_none:'暂无',
+    review:'人工复核',back:'返回重新诊断',cat:['冲刺','匹配','保底'],
+    admin_login_h:'管理后台登录',pw:'后台密码',enter:'进入后台',pw_err:'密码错误',
+    admin_h:'院校数据管理',th:['学校名','国家','GPA要求','雅思要求','录取率(%)','操作'],
+    save:'保存',del:'删除',confirm_del:'确认删除？',saved:'已保存',
+    add_h:'添加新院校',add_btn:'添加院校',added:'已添加',need_name:'请填写学校名',
+    student:'学生',country_label:'目标国家',unlimited:'不限',
+    policy:'人工复核已提交（L3专家签字模拟）'
+  },
+  en:{
+    compliance_title:'EU AI Act high-risk compliance notice:',
+    compliance_text:'This system assists high-risk decisions; final plans must be reviewed by a human expert.',
+    footer:'For course demonstration only',
+    h1:'AI University Planning System',
+    sub:'Enter scores and goals to generate a three-tier plan draft from the university database.',
+    name:'Name',gpa:'GPA (0-4.0)',ielts:'IELTS score',country:'Target country',country_opts:[['','Any'],['US','United States'],['UK','United Kingdom'],['AU','Australia']],
+    gdpr:'I have read the privacy and compliance statement and consent to use the above information for admission planning demo (GDPR consent).',
+    submit:'Generate AI admission plan',admin_btn:'Open admin panel',
+    result_h:'AI admission plan result',counter_title:'Counterfactual analysis',counter_none:'N/A',
+    review:'Human review',back:'Back to diagnosis',cat:['Reach','Target','Safety'],
+    admin_login_h:'Admin login',pw:'Admin password',enter:'Enter admin',pw_err:'Wrong password',
+    admin_h:'University data management',th:['University','Country','GPA req.','IELTS req.','Acceptance rate(%)','Actions'],
+    save:'Save',del:'Delete',confirm_del:'Confirm delete?',saved:'Saved',
+    add_h:'Add new university',add_btn:'Add university',added:'Added',need_name:'University name is required',
+    student:'Student',country_label:'Target country',unlimited:'Any',
+    policy:'Human review submitted (L3 expert sign-off simulation)'
+  }
+};
+
+let lang=localStorage.getItem('edupath_lang')||'zh';
+let U=JSON.parse(localStorage.getItem(S))||DEFAULT_U;
+let form={name:'张同学 / Alex',gpa:3.6,ielts:6.5,country:'US'};
+let route=location.hash||'#/';
+
+function t(k){return T[lang][k]||''}
+function saveU(){localStorage.setItem(S,JSON.stringify(U))}
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function uname(u){return lang==='en'?u.name_en:u.name_zh}
+function classify(x){if(x<60)return 0;if(x<=80)return 1;return 2}
+
+function recommend(gpa,ielts,country){
+  const list=U.filter(u=>country?u.country===country:true);
+  const scored=list.map(u=>{
+    const raw=(gpa/u.gpa)*60+(ielts/u.ielts)*40;
+    const ms=Math.min(100,Math.round(raw*100)/100);
+    return {...u,matchScore:ms,cat:classify(ms)};
+  }).sort((a,b)=>b.matchScore-a.matchScore);
+  const g=[[],[],[]];scored.forEach(x=>g[x.cat].push(x));
+  const empty=g.map((a,i)=>a.length===0?i:-1).filter(i=>i>=0);
+  if(empty.length>0){
+    const order=[...scored].sort((a,b)=>Math.abs(a.matchScore-65)-Math.abs(b.matchScore-65));
+    for(const cat of empty){const c=order.find(x=>x.cat!==cat&&g[x.cat].length>1);if(!c)continue;g[c.cat]=g[c.cat].filter(x=>x.id!==c.id);c.cat=cat;g[cat].push(c)}
+  }
+  const counter=scored.length>0?[{from:`IELTS ${ielts.toFixed(1)}`,to:`IELTS ${Math.min(9, ielts+1).toFixed(1)}`,before:`${scored[0].matchScore}%`,after:`${Math.min(100,Math.round(((gpa/scored[0].gpa)*60+(Math.min(9, ielts+1)/scored[0].ielts)*40)*100)/100)}%`}]:[];
+  return {g,counter};
+}
+
+function setLang(v){lang=v;localStorage.setItem('edupath_lang',v);render()}
+
+function bindTop(){
+  document.getElementById('zhBtn').onclick=()=>setLang('zh');
+  document.getElementById('enBtn').onclick=()=>setLang('en');
+  document.getElementById('t_compliance_title').textContent=t('compliance_title');
+  document.getElementById('t_compliance_text').textContent=t('compliance_text');
+  document.getElementById('t_footer').textContent=t('footer');
+  document.getElementById('t_admin').textContent=t('admin_btn');
+}
+
+function renderIndex(){
+  const app=document.getElementById('app');
+  const opts=t('country_opts').map(([v,l])=>`<option value="${v}" ${form.country===v?'selected':''}>${l}</option>`).join('');
+  app.innerHTML=`
+    <section class="hero">
+      <div>
+        <h1>${t('h1')}</h1>
+        <div class="sub">${t('sub')}</div>
+        <div class="panel" style="margin-top:18px">
+          <div class="grid2">
+            <div><label>${t('name')}</label><input id="f_name" value="${esc(form.name)}"/></div>
+            <div><label>${t('gpa')}</label><input id="f_gpa" type="number" step="0.1" min="0" max="4" value="${form.gpa}"/></div>
+            <div><label>${t('ielts')}</label><input id="f_ielts" type="number" step="0.5" min="0" max="9" value="${form.ielts}"/></div>
+            <div><label>${t('country')}</label><select id="f_country">${opts}</select></div>
+          </div>
+          <div style="margin-top:14px;padding:14px;border:1px dashed #f59e0b55;border-radius:16px;background:#f59e0b12">
+            <label style="display:flex;gap:12px;align-items:flex-start"><input type="checkbox" checked /><span>${t('gdpr')}</span></label>
+          </div>
+          <div class="actions" style="margin-top:16px">
+            <button class="btn btn-primary" id="go">${t('submit')}</button>
+            <a class="btn" href="#/admin-login">${t('admin_btn')}</a>
+          </div>
+        </div>
+      </div>
+      <div class="panel"><strong>11 universities / 11所院校</strong><div class="small" style="margin-top:8px">Harvard · Stanford · Columbia · NYU · UCLA · UIUC · Oxford · LSE · UCL · Sydney · UNSW</div></div>
+    </section>`;
+  document.getElementById('go').onclick=()=>{
+    form.name=document.getElementById('f_name').value;
+    form.gpa=Number(document.getElementById('f_gpa').value);
+    form.ielts=Number(document.getElementById('f_ielts').value);
+    form.country=document.getElementById('f_country').value;
+    location.hash='#/result';
+  };
+}
+
+function renderResult(){
+  const rec=recommend(form.gpa,form.ielts,form.country);
+  const app=document.getElementById('app');
+  const labels=t('cat');
+  app.innerHTML=`
+    <h1 style="margin-top:20px">${t('result_h')}</h1>
+    <div class="sub">${t('student')}：<strong>${esc(form.name)}</strong>｜GPA：<strong>${form.gpa}</strong>｜IELTS：<strong>${form.ielts}</strong>｜${t('country_label')}：<strong>${form.country||t('unlimited')}</strong></div>
+
+    <div class="counter" style="margin-top:14px"><strong>${t('counter_title')}：</strong> ${rec.counter.length===0?t('counter_none'):rec.counter.map(c=>`If <strong>${esc(c.from)}</strong> improves to <strong>${esc(c.to)}</strong>, composite match moves from <strong>${c.before}</strong> to <strong>${c.after}</strong>`).join('')}</div>
+
+    <div class="grid3" style="margin-top:16px">
+      ${[0,1,2].map(i=>`
+        <div class="panel">
+          <div style="margin-bottom:10px"><strong>${labels[i]}</strong></div>
+          ${rec.g[i].length===0?'<div class="small">-</div>':''}
+          ${rec.g[i].map(u=>`
+            <div class="card">
+              <strong>${uname(u)}</strong>
+              <div class="small">${u.country}｜GPA ${u.gpa}｜IELTS ${u.ielts}｜${u.acceptance_rate}%</div>
+              <div style="margin-top:8px"><span class="tag ${i===0?'rush':i===1?'match':'safe'}">Match: ${u.matchScore}%</span></div>
+              <div style="margin-top:8px"><button class="btn" onclick="alert('${t('policy')}')">${t('review')}</button></div>
+            </div>`).join('')}
+        </div>`).join('')}
+    </div>
+
+    <div class="actions" style="margin-top:16px"><a class="btn" href="#/">${t('back')}</a></div>`;
+}
+
+function renderAdminLogin(){
+  const app=document.getElementById('app');
+  app.innerHTML=`
+    <h1 style="margin-top:20px">${t('admin_login_h')}</h1>
+    <div class="panel" style="max-width:520px;margin-top:14px">
+      <div><label>${t('pw')}</label><input id="pw" type="password" placeholder="admin2026"/></div>
+      <div class="actions" style="margin-top:14px"><button class="btn btn-primary" id="enter">${t('enter')}</button><a class="btn" href="#/">${t('back')}</a></div>
+    </div>`;
+  document.getElementById('enter').onclick=()=>{if(document.getElementById('pw').value==='admin2026'){location.hash='#/admin'}else{alert(t('pw_err'))}};
+}
+
+function renderAdmin(){
+  const app=document.getElementById('app');
+  app.innerHTML=`
+    <h1 style="margin-top:20px">${t('admin_h')}</h1>
+    <div class="panel" style="overflow-x:auto;margin-top:14px">
+      <table>
+        <thead><tr>${t('th').map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+        <tbody>
+          ${U.map((u,idx)=>`<tr>
+            <td><input data-i="${idx}" data-k="name_${lang}" value="${uname(u)}"/></td>
+            <td><select data-i="${idx}" data-k="country"><option value="US" ${u.country==='US'?'selected':''}>US</option><option value="UK" ${u.country==='UK'?'selected':''}>UK</option><option value="AU" ${u.country==='AU'?'selected':''}>AU</option></select></td>
+            <td><input data-i="${idx}" data-k="gpa" type="number" step="0.1" min="0" max="4" value="${u.gpa}"/></td>
+            <td><input data-i="${idx}" data-k="ielts" type="number" step="0.5" min="0" max="9" value="${u.ielts}"/></td>
+            <td><input data-i="${idx}" data-k="acceptance_rate" type="number" step="0.1" min="0" max="100" value="${u.acceptance_rate}"/></td>
+            <td style="white-space:nowrap"><button class="btn" data-save="${idx}">${t('save')}</button> <button class="btn" data-del="${idx}">${t('del')}</button></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel" style="margin-top:16px">
+      <h2 style="margin-top:0">${t('add_h')}</h2>
+      <div class="grid2">
+        <div><label>${t('name')}</label><input id="n_name"/></div>
+        <div><label>${t('country')}</label><select id="n_country"><option value="US">US</option><option value="UK">UK</option><option value="AU">AU</option></select></div>
+        <div><label>${t('gpa')}</label><input id="n_gpa" type="number" step="0.1" min="0" max="4"/></div>
+        <div><label>${t('ielts')}</label><input id="n_ielts" type="number" step="0.5" min="0" max="9"/></div>
+        <div><label>${t('country_label')} %</label><input id="n_ar" type="number" step="0.1" min="0" max="100"/></div>
+      </div>
+      <div class="actions" style="margin-top:14px"><button class="btn btn-primary" id="add">${t('add_btn')}</button><a class="btn" href="#/">${t('back')}</a></div>
+    </div>`;
+
+  document.querySelectorAll('[data-save]').forEach(btn=>{
+    btn.onclick=()=>{
+      const i=Number(btn.dataset.save);
+      document.querySelectorAll(`[data-i="${i}"]`).forEach(el=>{
+        const k=el.dataset.k;const v=el.type==='number'?Number(el.value):el.value;U[i][k]=v;
+      });
+      localStorage.setItem(S,JSON.stringify(U));alert(t('saved'));
+    };
+  });
+
+  document.querySelectorAll('[data-del]').forEach(btn=>{
+    btn.onclick=()=>{if(confirm(t('confirm_del'))){U.splice(Number(btn.dataset.del),1);localStorage.setItem(S,JSON.stringify(U));render()}};
+  });
+
+  document.getElementById('add').onclick=()=>{
+    const nm=document.getElementById('n_name').value.trim();
+    if(!nm){alert(t('need_name'));return}
+    U.push({id:nm.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')||`id-${Date.now()}`,name_zh:nm,name_en:nm,country:document.getElementById('n_country').value,gpa:Number(document.getElementById('n_gpa').value),ielts:Number(document.getElementById('n_ielts').value),acceptance_rate:Number(document.getElementById('n_ar').value)});
+    localStorage.setItem(S,JSON.stringify(U));alert(t('added'));render();
+  };
+}
+
+function render(){bindTop();const h=(location.hash||'#/').split('?')[0];if(h==='#/result')renderResult();else if(h==='#/admin-login')renderAdminLogin();else if(h==='#/admin')renderAdmin();else renderIndex();}
+window.addEventListener('hashchange',render);
+render();
+</script>
+</body>
+</html>
