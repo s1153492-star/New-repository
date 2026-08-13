@@ -13,6 +13,7 @@ a{color:var(--primary)}
 .container{max-width:1200px;margin:0 auto;padding:0 24px}
 .topbar{background:var(--primary);color:white;padding:12px 0}
 .topbar-inner{display:flex;justify-content:space-between;align-items:center}
+.brand{display:flex;gap:10px;align-items:center;font-weight:700;font-size:20px}
 .top-actions{display:flex;gap:10px;align-items:center}
 .btn{padding:12px 18px;border-radius:12px;border:1px solid var(--border);background:white;color:var(--text);cursor:pointer;font-size:16px}
 .btn-ghost{background:transparent;color:white;border-color:rgba(255,255,255,0.25)}
@@ -25,6 +26,7 @@ a{color:var(--primary)}
 .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:0 20px 60px rgba(0,33,71,0.08)}
 .grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
 label{display:block;margin-bottom:8px;color:var(--muted);font-size:14px}
 input,select,textarea{width:100%;height:52px;padding:0 14px;border:1px solid #D1D5DB;border-radius:12px;background:white;color:var(--text);font-size:18px}
 textarea{height:auto;min-height:120px;padding:12px 14px}
@@ -50,18 +52,36 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 .progress{height:10px;background:#EEF2F7;border-radius:999px;overflow:hidden}
 .progress .fill{height:100%;border-radius:999px;width:0%;transition:width .9s ease}
 .btn-outline{border:1px solid var(--border);background:white;color:var(--text);border-radius:40px;padding:10px 18px;cursor:pointer}
-.policy-chip{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;border:1px solid var(--border);background:#F8FAFC;font-size:14px;color:var(--text)}
+.table-wrap{overflow:auto;background:white;border:1px solid var(--border);border-radius:16px}
+table{width:100%;border-collapse:collapse}
+th,td{border-bottom:1px solid var(--border);padding:12px;text-align:left;font-size:15px}
+th{background:#F8FAFC;color:var(--muted);font-weight:600}
+tr:nth-child(even){background:#FCFCFD}
+.footer{padding:22px 0;border-top:1px solid var(--border);color:#6B6B8A;text-align:center;margin-top:28px;font-size:14px}
+.small{color:#6B6B8A;font-size:14px}
+.locked{position:relative}
+.lock-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(245,247,250,0.2),rgba(245,247,250,0.9));backdrop-filter:blur(2px);border-radius:16px;display:flex;align-items:center;justify-content:center}
+.lock-box{background:white;border:1px solid var(--border);border-radius:16px;padding:16px 20px;box-shadow:0 12px 28px rgba(0,33,71,0.08);text-align:center;max-width:340px}
+.resource-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.resource{background:white;border:1px solid var(--border);border-radius:14px;padding:14px}
+.pricing{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.price-card{background:white;border:1px solid var(--border);border-radius:18px;padding:22px}
+.price-card.featured{border:2px solid var(--accent);box-shadow:0 16px 44px rgba(0,33,71,0.08)}
+.price-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.price-name{font-weight:700;color:var(--primary)}
+.price{font-size:28px;font-weight:800;color:var(--primary)}
+.report-section{background:white;border:1px solid var(--border);border-radius:18px;padding:22px}
 @media print{.topbar,.banner,.footer,.hide-print{display:none!important}body{background:white}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 .fade-up{animation:fadeUp .6s ease both}
-@media(max-width:1024px){.hero{grid-template-columns:1fr}.counter-banner{grid-template-columns:1fr}.grid3{grid-template-columns:1fr}}
-@media(max-width:768px){.grid2{grid-template-columns:1fr}h1{font-size:28px}.submit-btn{width:100%;justify-content:center}}
+@media(max-width:1024px){.hero{grid-template-columns:1fr}.counter-banner{grid-template-columns:1fr}.grid3,.pricing,.grid4{grid-template-columns:1fr}}
+@media(max-width:768px){.grid2,.resource-grid{grid-template-columns:1fr}h1{font-size:28px}.submit-btn{width:100%;justify-content:center}}
 </style>
 </head>
 <body>
 <header class="topbar">
   <div class="container topbar-inner">
-    <div style="display:flex;gap:10px;align-items:center;font-weight:700;font-size:20px">🎓 EduPath AI</div>
+    <div class="brand"><div>🎓</div><div>EduPath AI</div></div>
     <div class="top-actions">
       <button class="btn btn-ghost" id="langZh">中文</button>
       <button class="btn btn-ghost" id="langEn">EN</button>
@@ -77,39 +97,19 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--primary)
 <div class="footer hide-print"><div class="container">© 2026 EduPath AI · <span id="footText">仅供课程演示用途</span></div></div>
 
 <script>
-const LS_KEY='edupath_data_v7';const LS_TIER='edupath_tier';
+const LS_KEY='edupath_data_v4';const LS_TIER='edupath_tier';
 let lang=localStorage.getItem('edupath_lang')||'zh';
-let form={track:'domestic',domestic:{province:'广东',score:640,rank:'',level:'any'},overseas:{gpa:3.6,ielts:6.5,country:''}};
+let lastResult=null;let form={track:'domestic',domestic:{province:'广东',score:640,rank:'',level:'any'},overseas:{gpa:3.6,ielts:6.5,country:''}};
+const PROVINCES=['北京','上海','广东','浙江','江苏','湖北','四川','山东','安徽','陕西','天津','黑龙江','全国（估）'];
+const SCORE_RANK_CURVE=[{score:700,rank:50},{score:690,rank:150},{score:680,rank:400},{score:670,rank:900},{score:660,rank:1800},{score:650,rank:3500},{score:640,rank:6000},{score:630,rank:9500},{score:620,rank:14000},{score:610,rank:20000},{score:600,rank:28000},{score:590,rank:38000},{score:580,rank:50000},{score:560,rank:80000},{score:540,rank:120000},{score:520,rank:170000},{score:500,rank:230000},{score:480,rank:300000},{score:460,rank:380000},{score:440,rank:460000},{score:420,rank:530000},{score:400,rank:600000}];
+function estimateRankFromScore(score){if(typeof score!=='number'||Number.isNaN(score)) return null;const s=Math.max(380,Math.min(720,score));const c=SCORE_RANK_CURVE;if(s>=c[0].score) return Math.round(c[0].rank*(1-(s-c[0].score)/20));if(s<=c[c.length-1].score) return Math.round(c[c.length-1].rank*(1+(c[c.length-1].score-s)/20));for(let i=0;i<c.length-1;i++){const a=c[i],b=c[i+1];if(s>=b.score && s<=a.score){const t=(a.score-s)/(a.score-b.score);return Math.round(a.rank + t*(b.rank-a.rank));}}return null;}
+
 let resFilter={q:'',cat:'all',region:'all',tier:'all'};
+
 function getTier(){return localStorage.getItem(LS_TIER)||'free'}
 function setTier(v){localStorage.setItem(LS_TIER,v);render()}
-const TIERS={free:{courses:6},basic:{courses:18},pro:{courses:999}};
 
-const POLICY_DB={
-  '广东':[
-    {id:'gd_strongbase',name_zh:'强基计划（广东考生可报全国试点校）',name_en:'Strong-Foundation Plan (nationwide pilot open to Guangdong)',score_hint:660,rank_hint:1500,window:'高考后约6月报名',actions_zh:['提前准备学科特长材料','关注校测笔试/面试','注意志愿填报与锁档规则'],actions_en:['Prepare subject-strength materials','Watch for school tests/interviews','Note locking rules in application']},
-    {id:'gd_comprehensive',name_zh:'综合评价招生（广东多校参与）',name_en:'Comprehensive evaluation admission (multiple universities)',score_hint:630,rank_hint:6000,window:'每年12月-次年4月陆续开放',actions_zh:['整理综合素质档案','准备自荐信与获奖材料','关注各校材料截止日'],actions_en:['Build comprehensive quality portfolio','Prepare self-recommendation letters','Track per-school deadlines']},
-    {id:'gd_special',name_zh:'专项计划/地方专项（符合条件考生）',name_en:'Special/local-targeted plan (eligible candidates)',score_hint:600,rank_hint:12000,window:'高考报名阶段确认资格',actions_zh:['确认户籍/学籍资格','准备户籍与学籍证明材料','关注省内投档规则'],actions_en:['Confirm residency/enrollment eligibility','Prepare proof documents','Track provincial admission rules']}
-  ],
-  '浙江':[
-    {id:'zj_trinity',name_zh:'浙江“三位一体”综合评价招生',name_en:'Zhejiang “Trinity” comprehensive evaluation',score_hint:640,rank_hint:5000,window:'2月-4月报名，5月-6月校测',actions_zh:['准备学考成绩与综合素质材料','模拟面试（结构化/半结构化）','按学校要求提交材料并确认志愿'],actions_en:['Prepare academic exam + portfolio','Practice structured interviews','Submit materials and confirm preferences']},
-    {id:'zj_strongbase',name_zh:'强基计划（浙江考生可报全国试点校）',name_en:'Strong-Foundation Plan (nationwide pilot open to Zhejiang)',score_hint:670,rank_hint:1200,window:'高考后约6月报名',actions_zh:['针对目标校准备校测内容','突出学科竞赛/科研经历','关注锁档与录取规则'],actions_en:['Prepare school-specific tests','Highlight competition/research','Note lock/admission rules']},
-    {id:'zj_subject',name_zh:'学科竞赛/创新成果通道',name_en:'Competition/innovation achievement track',score_hint:620,rank_hint:8000,window:'全年积累，关键节点在高三前',actions_zh:['选择1-2个核心赛事持续投入','建立成果档案（论文/专利/奖项）','与目标院校要求对标'],actions_en:['Commit to 1-2 core competitions','Build achievement dossier','Align with target school requirements']}
-  ],
-  '北京':[
-    {id:'bj_strongbase',name_zh:'强基计划（北京多校试点集中）',name_en:'Strong-Foundation Plan (many pilots in Beijing)',score_hint:670,rank_hint:1200,window:'高考后约6月报名',actions_zh:['提前研究目标校校测风格','准备学科深度题目与面试','注意综合成绩折算方式'],actions_en:['Study target school test style','Prepare deep subject questions','Note composite score calculation']},
-    {id:'bj_comprehensive',name_zh:'综合评价招生（部分院校）',name_en:'Comprehensive evaluation (selected universities)',score_hint:650,rank_hint:3000,window:'12月-次年4月',actions_zh:['整理综合素质材料','准备面试表达与案例材料','按时提交报名材料'],actions_en:['Build portfolio','Practice interviews','Submit on time']}
-  ],
-  '上海':[
-    {id:'sh_comprehensive',name_zh:'综合评价录取（上海多校）',name_en:'Comprehensive evaluation admission (Shanghai)',score_hint:650,rank_hint:3000,window:'春季-初夏',actions_zh:['准备综合素质材料与面试','关注校内推荐与材料要求','确认志愿与录取规则'],actions_en:['Prepare portfolio & interview','Track school-specific rules','Confirm preference & admission rules']}
-  ],
-  '江苏':[
-    {id:'js_comprehensive',name_zh:'综合评价招生（江苏多校）',name_en:'Comprehensive evaluation (Jiangsu)',score_hint:640,rank_hint:5000,window:'12月-次年4月',actions_zh:['准备学业水平与综合素质材料','整理获奖与社会实践材料','关注各校截止日期'],actions_en:['Prepare academic + quality materials','Organize awards & social service','Track deadlines']}
-  ],
-  '湖北':[
-    {id:'hb_strongbase',name_zh:'强基计划（湖北考生可报全国试点校）',name_en:'Strong-Foundation Plan (nationwide pilot open to Hubei)',score_hint:660,rank_hint:1500,window:'高考后约6月',actions_zh:['准备学科测试与面试材料','突出科研/竞赛经历','关注锁档与录取规则'],actions_en:['Prepare subject tests/interview','Highlight research/competition','Note admission rules']}
-  ]
-};
+const TIERS={free:{courses:6},basic:{courses:18},pro:{courses:999}};
 
 const DEFAULT_DOMESTIC=[
   {id:'tsinghua',name_zh:'清华大学',name_en:'Tsinghua University',region:'mainland',level:'985',province_hint:'北京',score_line:685,rank_hint:300,gpa:3.9,ielts:7.5,acceptance_rate:4,note_zh:'顶尖985',note_en:'Top 985'},
@@ -146,6 +146,11 @@ const DEFAULT_OVERSEAS=[
   {id:'unsw',name_zh:'新南威尔士大学',name_en:'UNSW',region:'AU',country:'AU',gpa:3.0,ielts:6.0,acceptance_rate:40,score_line:630,level:'-',note_zh:'就业导向',note_en:'Career oriented'}
 ];
 
+
+const POLICY_DB={};
+['北京','上海','广东','浙江','江苏','湖北','四川','山东','安徽','陕西','天津','黑龙江','全国（估）'].forEach(p=>{POLICY_DB[p]=[{id:`${p}_strongbase`,name_zh:`强基计划（${p}考生可报全国试点校）`,name_en:`Strong-Foundation Plan (nationwide pilot open to ${p})`,score_hint:660,rank_hint:1500,window:'高考后约6月报名',actions_zh:['提前准备学科特长材料','关注校测笔试/面试','注意志愿填报与锁档规则'],actions_en:['Prepare subject-strength materials','Watch for school tests/interviews','Note locking rules in application']},{id:`${p}_comprehensive`,name_zh:`综合评价招生（${p}参与高校/通道）`,name_en:`Comprehensive evaluation admission (${p})`,score_hint:640,rank_hint:5000,window:'12月-次年4月陆续开放',actions_zh:['整理综合素质档案','准备自荐信与获奖材料','关注各校材料截止日'],actions_en:['Build comprehensive quality portfolio','Prepare self-recommendation letters','Track per-school deadlines']},{id:`${p}_special`,name_zh:`专项计划/地方专项（${p}符合条件考生）`,name_en:`Special/local-targeted plan (${p} eligible candidates)`,score_hint:610,rank_hint:10000,window:'高考报名阶段确认资格',actions_zh:['确认户籍/学籍资格','准备户籍与学籍证明材料','关注省内投档规则'],actions_en:['Confirm residency/enrollment eligibility','Prepare proof documents','Track provincial admission rules']}]})
+POLICY_DB['浙江'].splice(1,0,{id:'zj_trinity',name_zh:'浙江“三位一体”综合评价招生',name_en:'Zhejiang “Trinity” comprehensive evaluation',score_hint:640,rank_hint:5000,window:'2月-4月报名，5月-6月校测',actions_zh:['准备学考成绩与综合素质材料','模拟面试（结构化/半结构化）','按学校要求提交材料并确认志愿'],actions_en:['Prepare academic exam + portfolio','Practice structured interviews','Submit materials and confirm preferences']})
+POLICY_DB['广东'].splice(1,0,{id:'gd_multi',name_zh:'综合评价招生（广东多校参与）',name_en:'Comprehensive evaluation admission (multiple Guangdong universities)',score_hint:630,rank_hint:6000,window:'每年12月-次年4月陆续开放',actions_zh:['整理综合素质档案','准备自荐信与获奖材料','关注各校材料截止日'],actions_en:['Build comprehensive quality portfolio','Prepare self-recommendation letters','Track per-school deadlines']})
 const RESOURCES=[
   {id:'r01',cat:'IELTS',name_zh:'雅思基础自测与学习路径',name_en:'IELTS baseline test & path',regions:['Global'],tier:'free',tag:'免费'},
   {id:'r02',cat:'IELTS',name_zh:'雅思阅读方法论精讲',name_en:'IELTS Reading strategy',regions:['Global'],tier:'free',tag:'免费'},
@@ -186,7 +191,7 @@ const RESOURCES=[
   {id:'r37',cat:'高考提分',name_zh:'语文/数学/英语提分诊断',name_en:'Core subject diagnostics',regions:['mainland'],tier:'basic',tag:'付费'},
   {id:'r38',cat:'高考提分',name_zh:'理综/文综冲刺提分计划',name_en:'Science/Arts sprint plan',regions:['mainland'],tier:'basic',tag:'付费'},
   {id:'r39',cat:'高考提分',name_zh:'强基/综评面试训练营',name_en:'Strong foundation/interview camp',regions:['mainland'],tier:'pro',tag:'高阶'},
-  {id:'r40',cat:'IELTS UKVI',name_zh:'UKVI雅思备考指南',name_en:'IELTS UKVI prep guide',regions:['UK'],tier:'basic',tag:'付费'},
+  {id:'r40',cat:'雅思UKVI',name_zh:'UKVI雅思备考指南',name_en:'IELTS UKVI prep guide',regions:['UK'],tier:'basic',tag:'付费'},
   {id:'r41',cat:'PTE',name_zh:'PTE基础技巧与模板课',name_en:'PTE basics & templates',regions:['AU','UK'],tier:'basic',tag:'付费'},
   {id:'r42',cat:'PTE',name_zh:'PTE高分口语写作训练',name_en:'PTE speaking & writing boost',regions:['AU','UK'],tier:'pro',tag:'高阶'},
   {id:'r43',cat:'作品集',name_zh:'艺术/设计作品集指导',name_en:'Art/Design portfolio coaching',regions:['UK','US'],tier:'pro',tag:'高阶'},
@@ -210,7 +215,7 @@ function resetAll(){localStorage.removeItem(LS_KEY);render()}
 let DB=loadAll();
 
 const T={
-  zh:{h1:'AI 升学规划系统（含省份实时政策）',sub:'选择省份后立即展示该省升学政策，并根据你当前分数计算匹配度；填写完整后可生成三档规划。',
+  zh:{h1:'AI 升学规划系统',sub:'先选择升学通道，再输入条件：系统会自动按“内地高考体系”或“海外语言+GPA体系”匹配院校，并按订阅套餐推荐课程与报告。',
       tab_domestic:'申请内地大学',tab_overseas:'申请海外 / 港澳新',province:'省份',province_opts:['北京','上海','广东','浙江','江苏','湖北','四川','山东','安徽','陕西','天津','黑龙江','全国（估）'],
       score:'高考分数（估分/实际）',rank:'省排名（可选）',level:'目标层次',level_opts:[['any','不限'],['985','985优先'],['211','211优先']],
       gpa:'高中GPA（0-4.0）',ielts:'雅思（或等效）',country:'目标地区',country_opts:[['','不限'],['HK','香港'],['SG','新加坡'],['US','美国'],['UK','英国'],['AU','澳洲']],
@@ -218,10 +223,24 @@ const T={
       info_student:'学生',info_province:'省份',info_score:'高考分数',info_rank:'省排名',info_gpa:'GPA',info_ielts:'IELTS',info_region:'地区',
       track_label:'当前通道',domestic_label:'内地高考',overseas_label:'海外申请',
       counter_title:'反事实推演',cat:['冲刺','匹配','保底'],review:'人工复核',back:'返回',policy:'已提交人工复核请求（L3专家签字模拟）',
-      policy_preview:'省份政策预览',policy_match:'匹配度',policy_window:'窗口',policy_actions:'建议动作',
-      plus_h:'+35%',counter_from:'当前',counter_to:'提升后',counter_text:'提升后综合匹配度显著提升'
+      admin_login:'管理后台登录',pw:'后台密码',enter:'进入后台',pw_err:'密码错误',
+      admin_h:'院校数据管理',admin_hint:'修改会保存到浏览器本地，刷新不丢失。',add:'添加院校',reset:'重置为默认',
+      table_domestic:'内地院校',table_overseas:'海外/港澳新院校',edit:'编辑',del:'删除',confirm_del:'确认删除？',saved:'已保存',added:'已添加',
+      foot:'仅供课程演示用途',sample_title:'院校样本',sample_hint:'内地与海外共 29 所院校；可在后台维护。',
+      add_title:'添加/编辑院校',name_zh:'中文名',name_en:'英文名',region:'地区',level:'层次',score_line:'参考分线',rank_hint:'参考位次',acceptance_rate:'录取率(%)',gpa_req:'GPA要求',ielts_req:'雅思要求',note_zh:'中文备注',note_en:'英文备注',cancel:'取消',save_btn:'保存',
+      plus_h:'+35%',counter_from:'当前',counter_to:'提升后',counter_text:'提升后综合匹配度显著提升',
+      pricing_h:'订阅套餐',pricing_sub:'套餐越高，课程推荐越完整、匹配维度越细、规划报告越详细。',free:'免费版',basic:'Basic',pro:'Pro',
+      free_price:'¥0/月',basic_price:'¥199/月',pro_price:'¥699/月',
+      free_desc:['基础三档匹配','少量课程推荐','摘要版规划报告'],
+      basic_desc:['更细匹配维度','更多课程推荐','标准版报告（含时间线）'],
+      pro_desc:['完整匹配解释','不限课程推荐','完整版报告（行动清单+风险项）'],
+      choose:'选择该套餐',current:'当前套餐',
+      resources_h:'课程与资源库',locked_tip:'该区域根据套餐开放，升级后可查看更完整资源。',
+      report_h:'规划报告',report_summary:'摘要版',report_standard:'标准版',report_full:'完整版',print:'打印 / 导出PDF',upgrade:'升级套餐查看完整报告',
+      res_search:'搜索资源',res_cat:'课程类别',res_region:'地区',res_tier:'套餐可见性',cat_all:'全部',region_all:'全部',tier_all:'全部',region_mainland:'内地',region_us:'美国',region_uk:'英国',region_hk:'香港',region_sg:'新加坡',region_au:'澳洲',region_global:'全球',
+      show_locked:'显示全部（含锁定）',view:'查看',locked:'需升级',open:'可查看'
   },
-  en:{h1:'AI Admission Planning (real-time province policies)',sub:'Select a province to see its policies instantly with a personalized fit score; complete inputs to generate a 3-tier plan.',
+  en:{h1:'AI Admission Planning System',sub:'Choose the track first. The system matches universities by China Gaokao rules or overseas GPA+IELTS rules, then recommends courses and reports based on your package.',
       tab_domestic:'Mainland China',tab_overseas:'Overseas / HK / SG',province:'Province',province_opts:['Beijing','Shanghai','Guangdong','Zhejiang','Jiangsu','Hubei','Sichuan','Shandong','Anhui','Shaanxi','Tianjin','Heilongjiang','National (est.)'],
       score:'Gaokao score (est./actual)',rank:'Province rank (optional)',level:'Target level',level_opts:[['any','Any'],['985','Prefer 985'],['211','Prefer 211']],
       gpa:'High school GPA (0-4.0)',ielts:'IELTS (or equivalent)',country:'Target region',country_opts:[['','Any'],['HK','Hong Kong'],['SG','Singapore'],['US','USA'],['UK','UK'],['AU','Australia']],
@@ -229,54 +248,226 @@ const T={
       info_student:'Student',info_province:'Province',info_score:'Gaokao',info_rank:'Rank',info_gpa:'GPA',info_ielts:'IELTS',info_region:'Region',
       track_label:'Track',domestic_label:'Mainland China',overseas_label:'Overseas',
       counter_title:'Counterfactual analysis',cat:['Reach','Target','Safety'],review:'Human review',back:'Back',policy:'Human review submitted (L3 expert sign-off simulation)',
-      policy_preview:'Province policy preview',policy_match:'Fit',policy_window:'Window',policy_actions:'Actions',
-      plus_h:'+35%',counter_from:'Current',counter_to:'After',counter_text:'Match improves materially after the uplift'
+      admin_login:'Admin login',pw:'Password',enter:'Enter',pw_err:'Wrong password',
+      admin_h:'University data management',admin_hint:'Changes are saved locally in the browser.',add:'Add university',reset:'Reset to default',
+      table_domestic:'Mainland universities',table_overseas:'Overseas / HK / SG',edit:'Edit',del:'Delete',confirm_del:'Confirm delete?',saved:'Saved',added:'Added',
+      foot:'For course demo only',sample_title:'Sample universities',sample_hint:'29 sample universities across tracks; editable in admin.',
+      add_title:'Add / Edit university',name_zh:'Name (ZH)',name_en:'Name (EN)',region:'Region',level:'Level',score_line:'Ref score line',rank_hint:'Ref rank',acceptance_rate:'Acceptance(%)',gpa_req:'GPA req.',ielts_req:'IELTS req.',note_zh:'Note (ZH)',note_en:'Note (EN)',cancel:'Cancel',save_btn:'Save',
+      plus_h:'+35%',counter_from:'Current',counter_to:'After',counter_text:'Match improves materially after the uplift',
+      pricing_h:'Packages',pricing_sub:'Higher tiers unlock more precise matching, richer course recommendations, and more detailed reports.',free:'Free',basic:'Basic',pro:'Pro',
+      free_price:'$0/mo',basic_price:'$29/mo',pro_price:'$99/mo',
+      free_desc:['Basic 3-tier match','Fewer course suggestions','Summary report'],
+      basic_desc:['Finer match dimensions','More course suggestions','Standard report with timeline'],
+      pro_desc:['Full match explanation','Unlimited course suggestions','Full report (action plan + risk flags)'],
+      choose:'Choose plan',current:'Current plan',
+      resources_h:'Course & resource library',locked_tip:'This section opens by tier. Upgrade to view the full set.',
+      report_h:'Planning report',report_summary:'Summary',report_standard:'Standard',report_full:'Full',print:'Print / Export PDF',upgrade:'Upgrade to unlock full report',
+      res_search:'Search resources',res_cat:'Category',res_region:'Region',res_tier:'Tier access',cat_all:'All',region_all:'All',tier_all:'All',region_mainland:'Mainland',region_us:'USA',region_uk:'UK',region_hk:'Hong Kong',region_sg:'Singapore',region_au:'Australia',region_global:'Global',
+      show_locked:'Show all (incl. locked)',view:'View',locked:'Upgrade',open:'Available'
   }
 };
 function t(k){return T[lang][k]||''}
+function esc(s){return String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
 function uname(u){return lang==='en'?u.name_en:u.name_zh}
 function unote(u){return lang==='en'?u.note_en:u.note_zh}
 function classifyDomesticDelta(delta){return delta<-20?0:delta<=15?1:2}
-function recommendDomestic(score,level){let list=DB.domestic.slice();if(level==='985')list=list.filter(u=>u.level==='985');if(level==='211')list=list.filter(u=>u.level==='211'||u.level==='985');const scored=list.map(u=>{const delta=score-u.score_line;const ms=Math.round(Math.min(100,Math.max(10,60+delta*0.8)));return {...u,matchScore:ms,delta,cat:classifyDomesticDelta(delta)}}).sort((a,b)=>b.matchScore-a.matchScore);const g=[[],[],[]];scored.forEach(x=>g[x.cat].push(x));return {g,scored};}
-function recommendOverseas(gpa,ielts,country){let list=DB.overseas.filter(u=>country?u.country===country:true);const scored=list.map(u=>{const raw=(gpa/u.gpa)*60+(ielts/u.ielts)*40;const ms=Math.min(100,Math.round(raw*100)/100);return {...u,matchScore:ms,cat:ms<60?0:ms<=80?1:2}}).sort((a,b)=>b.matchScore-a.matchScore);const g=[[],[],[]];scored.forEach(x=>g[x.cat].push(x));return {g,scored};}
+function recommendDomestic(score,providedRank,level){const estRank=estimateRankFromScore(score);const rank=(typeof providedRank==='number'&&!Number.isNaN(providedRank)&&providedRank>0)?providedRank:estRank;let list=DB.domestic.slice();if(level==='985')list=list.filter(u=>u.level==='985');if(level==='211')list=list.filter(u=>u.level==='211'||u.level==='985');if(level==='双一流')list=list.filter(u=>['985','211','双一流'].includes(u.level));const scored=list.map(u=>{const scoreDelta=score-u.score_line;const rankDelta=rank!=null?(rank-u.rank_hint):null;const scoreFit=Math.min(100,Math.max(10,60+scoreDelta*0.8));const rankFit=rank!=null?Math.min(100,Math.max(10,60-rankDelta*0.003)):scoreFit;const ms=Math.round((scoreFit*0.6)+(rankFit*0.4));const cat=ms<60?0:ms<=80?1:2;return {...u,matchScore:ms,scoreDelta,rankDelta,rankUsed:rank,cat}}).sort((a,b)=>b.matchScore-a.matchScore);const g=[[],[],[]];scored.forEach(x=>g[x.cat].push(x));return {g:g.map(arr=>arr.slice(0,10)),scored,rank,estRank}}
+function recommendOverseas(gpa,ielts,country){
+  let list=DB.overseas.filter(u=>country?u.country===country:true);
+  const scored=list.map(u=>{const raw=(gpa/u.gpa)*60+(ielts/u.ielts)*40;const ms=Math.min(100,Math.round(raw*100)/100);return {...u,matchScore:ms,cat:ms<60?0:ms<=80?1:2}}).sort((a,b)=>b.matchScore-a.matchScore);
+  const g=[[],[],[]];scored.forEach(x=>g[x.cat].push(x));return {g,scored};
+}
 function balance(g){const out=g.map(a=>a.slice());const empty=out.map((a,i)=>a.length===0?i:-1).filter(i=>i>=0);if(empty.length===0)return out;const all=out.flat().sort((a,b)=>Math.abs(a.matchScore-65)-Math.abs(b.matchScore-65));for(const c of empty){const x=all.find(y=>y.cat!==c&&out[y.cat].length>1);if(!x)continue;out[x.cat]=out[x.cat].filter(y=>y.id!==x.id);x.cat=c;out[c].push(x)}return out}
-function policyFit(score,p){return Math.round(Math.min(100,Math.max(10,60+(score-p.score_hint)*0.8)))}
-function policyPreviewHtml(province,score){const items=(POLICY_DB[province]||[]).map(p=>({...p,fit:policyFit(score,p)})).sort((a,b)=>b.fit-a.fit);if(items.length===0)return `<div class="card"><div style="font-weight:700">${t('policy_preview')} · ${province||'-'}</div><div class="small" style="margin-top:8px">暂无示例政策 / No sample policy</div></div>`;return `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700">${t('policy_preview')} · ${province}</div><div class="small">实时更新 / Live update</div></div><div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">${items.map(p=>`<div class="policy-chip">${lang==='en'?p.name_en:p.name_zh} <span class="badge">${t('policy_match')} ${p.fit}%</span></div>`).join('')}</div><div class="grid2">${items.map(p=>`<div style="background:#F8FAFC;border:1px solid var(--border);border-radius:14px;padding:14px"><div style="font-weight:700">${lang==='en'?p.name_en:p.name_zh}</div><div class="small" style="margin-top:4px">${t('policy_window')}：${p.window}</div><div style="margin-top:8px;font-weight:600">${t('policy_actions')}</div><ul style="margin:6px 0 0 18px">${(lang==='en'?p.actions_en:p.actions_zh).map(a=>`<li>${a}</li>`).join('')}</ul></div>`).join('')}</div></div>`}
+function regionLabel(r){return {mainland:t('region_mainland'),HK:t('region_hk'),SG:t('region_sg'),US:t('region_us'),UK:t('region_uk'),AU:t('region_au'),Global:t('region_global')}[r]||r}
+function tierAccess(tier, required){const o=['free','basic','pro'];return o.indexOf(tier)>=o.indexOf(required)}
 
-function cardHtml(u,i,pct){const colors=[`var(--red)`,`var(--orange)`,`var(--green)`];const emojis=['🚀','🎯','🛡️'];return `<div class="uni-card fade-up" style="animation-delay:${i*0.06}s"><div class="top-bar" style="background:${colors[i]}"></div><div class="body"><div style="display:flex;justify-content:space-between;align-items:center"><div class="name">${uname(u)}</div><span class="tag ${i===0?'rush':i===1?'match':'safe'}">${emojis[i]} ${t('cat')[i]}</span></div><div class="meta">${u.region==='mainland'?`层次：${u.level}｜参考分线：${u.score_line}｜${unote(u)}`:`${u.country}｜GPA ${u.gpa}｜IELTS ${u.ielts}｜${u.acceptance_rate}%｜${unote(u)}`}</div><div style="margin-top:12px"><div style="display:flex;justify-content:space-between;font-size:13px;color:#6B6B8A;margin-bottom:6px"><span>Match</span><span>${pct}%</span></div><div class="progress"><div class="fill" style="width:${pct}%;background:${colors[i]}"></div></div></div></div><div class="actions"><button class="btn-outline" onclick="alert('${t('policy')}')">${t('review')}</button></div></div>`}
+function filterResources(list, tier){
+  const q=resFilter.q.toLowerCase();
+  return list.filter(r=>{
+    if(resFilter.cat!=='all' && r.cat!==resFilter.cat) return false;
+    if(resFilter.region!=='all' && !r.regions.includes(resFilter.region) && !r.regions.includes('Global')) return false;
+    if(q && !(r.name_zh.toLowerCase().includes(q) || r.name_en.toLowerCase().includes(q) || r.cat.toLowerCase().includes(q))) return false;
+    return true;
+  });
+}
+
+function resourcesPage(){
+  const tier=getTier();
+  const list=filterResources(RESOURCES, tier);
+  const catOpts=['IELTS','TOEFL','GRE','GMAT','SAT/ACT','IELTS UKVI','PTE','留学规划','高考提分','背景提升','文书/SOP','面试','作品集','学科竞赛'];
+  const regionOpts=[['all',t('region_all')],['Global',t('region_global')],['mainland',t('region_mainland')],['US',t('region_us')],['UK',t('region_uk')],['HK',t('region_hk')],['SG',t('region_sg')],['AU',t('region_au')]];
+  const tierOpts=[['all',t('tier_all')],['free',t('free')],['basic',t('basic')],['pro',t('pro')]];
+
+  return `
+    <div style="padding-top:22px" class="fade-up">
+      <h1>${t('resources_h')}</h1>
+      <div class="sub">${lang==='zh'?'覆盖雅思/托福/GRE/GMAT/文书/面试/背景提升/高考提分等，并按地区分类。':'Covers IELTS, TOEFL, GRE, GMAT, essays, interviews, extracurriculars, and Gaokao boosters, grouped by region.'}</div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="grid4">
+          <div><label>${t('res_search')}</label><input id="rq" value="${esc(resFilter.q)}" placeholder="IELTS / 文书 / HK"/></div>
+          <div><label>${t('res_cat')}</label><select id="rcat"><option value="all">${t('cat_all')}</option>${catOpts.map(c=>`<option value="${c}" ${resFilter.cat===c?'selected':''}>${c}</option>`).join('')}</select></div>
+          <div><label>${t('res_region')}</label><select id="rregion">${regionOpts.map(([v,l])=>`<option value="${v}" ${resFilter.region===v?'selected':''}>${l}</option>`).join('')}</select></div>
+          <div><label>${t('res_tier')}</label><select id="rtier">${tierOpts.map(([v,l])=>`<option value="${v}" ${resFilter.tier===v?'selected':''}>${l}</option>`).join('')}</select></div>
+        </div>
+        <div class="small" style="margin-top:8px">${lang==='zh'?`当前套餐：<strong>${tier.toUpperCase()}</strong>，可查看前 ${TIERS[tier].courses} 条资源。`:`Current plan: <strong>${tier.toUpperCase()}</strong>. You can view the first ${TIERS[tier].courses} resources.`}</div>
+      </div>
+
+      <div class="grid3" style="margin-top:14px;align-items:start">
+        ${list.map((r,idx)=>{
+          const unlocked = idx < TIERS[tier].courses;
+          return `<div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center"><div style="font-weight:700">${lang==='en'?r.name_en:r.name_zh}</div><span class="badge">${r.cat}</span></div>
+            <div class="small" style="margin-top:6px">${lang==='zh'?'地区':'Regions'}：${r.regions.map(regionLabel).join(' / ')}</div>
+            <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><span class="badge">${r.tag}</span><span class="badge">${unlocked?t('open'):t('locked')}</span></div>
+            <div style="margin-top:10px">${unlocked?`<a class="btn btn-primary" href="#/pricing">${t('view')}</a>`:`<a class="btn btn-accent" href="#/pricing">${t('locked')}</a>`}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    </div>`;
+}
+
+function pricingHtml(){
+  const tier=getTier();
+  const cards=[
+    ['free',t('free'),t('free_price'),t('free_desc')],
+    ['basic',t('basic'),t('basic_price'),t('basic_desc')],
+    ['pro',t('pro'),t('pro_price'),t('pro_desc')]
+  ];
+  return `<div class="pricing">${cards.map(([key,name,price,desc])=>`<div class="price-card ${key===tier?'featured':''}"><div class="price-head"><div class="price-name">${name}</div>${key===tier?'<div class="price-badge">'+t('current')+'</div>':''}</div><div class="price">${price}</div><ul style="margin:12px 0 0 18px">${(desc||[]).map(d=>`<li>${d}</li>`).join('')}</ul><div style="margin-top:12px"><button class="btn ${key===tier?'btn-accent':'btn-primary'}" onclick="setTier('${key}')">${key===tier?t('current'):t('choose')}</button></div></div>`).join('')}</div>`;
+}
+
+
+function policyFit(score,p){return Math.round(Math.min(100,Math.max(10,60+(score-p.score_hint)*0.8)))}
+function policySection(province,score){const items=(POLICY_DB[province]||[]).map(p=>({...p,fit:policyFit(score,p)})).sort((a,b)=>b.fit-a.fit);if(items.length===0)return '<div class="card"><div style="font-weight:700">省份升学政策（生成后展示） · '+(province||'-')+'</div><div class="small" style="margin-top:8px">当前省份暂无示例政策。</div></div>';return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700">省份升学政策（生成后展示） · '+province+'</div><div class="small">基于你输入的分数实时计算</div></div><div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px">'+items.map(p=>'<div class="policy-chip">'+(lang==='en'?p.name_en:p.name_zh)+' <span class="badge">匹配度 '+p.fit+'%</span></div>').join('')+'</div><div class="grid2">'+items.map(p=>'<div style="background:#F8FAFC;border:1px solid var(--border);border-radius:14px;padding:14px"><div style="font-weight:700">'+(lang==='en'?p.name_en:p.name_zh)+'</div><div class="small" style="margin-top:4px">窗口：'+p.window+'</div><div style="margin-top:8px;font-weight:600">建议动作</div><ul style="margin:6px 0 0 18px">'+(lang==='en'?p.actions_en:p.actions_zh).map(a=>'<li>'+a+'</li>').join('')+'</ul></div>').join('')+'</div></div>'}
+function scoreSegment(score){if(score>=680)return 'top';if(score>=660)return 'high';if(score>=640)return 'midhigh';if(score>=620)return 'mid';if(score>=600)return 'midlow';return 'low'}
+function scoreRecommendedResourceIds(score){const seg=scoreSegment(score);const map={top:['r08','r13','r17','r24','r34'],high:['r07','r15','r16','r25','r35'],midhigh:['r06','r10','r11','r33','r39'],mid:['r04','r05','r22','r23','r37'],midlow:['r03','r32','r36','r47','r48'],low:['r01','r02','r32','r36','r47']};return map[seg]||map.mid}
+function scoreResourceCards(score){const ids=new Set(scoreRecommendedResourceIds(score));const tier=getTier();const limit=TIERS[tier].courses;const list=RESOURCES.filter(r=>ids.has(r.id));return '<div class="card" style="margin-top:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-weight:700">'+(lang==='zh'?'分数段资源推荐':'Score-segment resource recommendations')+'</div><div class="small">'+(lang==='zh'?'当前分数：':'Score: ')+score+'</div></div><div class="grid3">'+list.map((r,idx)=>{const unlocked=idx<limit;return '<div style="background:#F8FAFC;border:1px solid var(--border);border-radius:14px;padding:14px"><div style="font-weight:700">'+(lang==='en'?r.name_en:r.name_zh)+'</div><div class="small" style="margin-top:6px">'+r.cat+' · '+r.tag+'</div><div style="margin-top:8px">'+(unlocked?'<span class="badge">'+(lang==='zh'?'可查看':'Available')+'</span>':'<a class="btn btn-accent" href="#/pricing">'+(lang==='zh'?'升级查看':'Upgrade')+'</a>')+'</div></div>'}).join('')+'</div></div>'}
+function cardHtml(u,i,pct,tier){
+  const colors=[`var(--red)`,`var(--orange)`,`var(--green)`];const emojis=['🚀','🎯','🛡️'];
+  const detail = tier==='free' ? '' : `<div class="small" style="margin-top:6px">${lang==='zh'?'建议动作：准备材料 + 节点提醒 + 专家复核':'Suggested action: materials prep + timeline + human review'}</div>`;
+  return `<div class="uni-card fade-up" style="animation-delay:${i*0.06}s"><div class="top-bar" style="background:${colors[i]}"></div><div class="body"><div style="display:flex;justify-content:space-between;align-items:center"><div class="name">${uname(u)}</div><span class="tag ${i===0?'rush':i===1?'match':'safe'}">${emojis[i]} ${t('cat')[i]}</span></div><div class="meta">${u.region==='mainland'?`层次：${u.level}｜参考分线：${u.score_line}｜${unote(u)}`:`${u.country}｜GPA ${u.gpa}｜IELTS ${u.ielts}｜${u.acceptance_rate}%｜${unote(u)}`}</div><div style="margin-top:12px"><div style="display:flex;justify-content:space-between;font-size:13px;color:#6B6B8A;margin-bottom:6px"><span>Match</span><span>${pct}%</span></div><div class="progress"><div class="fill" style="width:${pct}%;background:${colors[i]}"></div></div></div>${detail}</div><div class="actions"><button class="btn-outline" onclick="alert('${t('policy')}')">${t('review')}</button></div></div>`;
+}
+
+function reportHtml(track, tier){
+  const label = track==='domestic' ? '内地高考' : '海外申请';
+  if(tier==='free'){
+    return `<div class="report-section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong>${t('report_h')} · ${t('report_summary')}</strong><span class="badge">${label}</span></div><div class="small">${lang==='zh'?'摘要版：仅包含总览与三档结果。':'Summary: overview + 3 tiers only.'}</div><div style="margin-top:10px"><a class="btn btn-accent" href="#/pricing">${t('upgrade')}</a></div></div>`;
+  }
+  if(tier==='basic'){
+    return `<div class="report-section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong>${t('report_h')} · ${t('report_standard')}</strong><span class="badge">${label}</span></div><ul style="margin:8px 0 0 18px"><li>学生条件与通道说明</li><li>三档院校清单与匹配分</li><li>时间线建议（标化/申请节点）</li></ul><div style="margin-top:10px"><button class="btn btn-primary" onclick="window.print()">${t('print')}</button></div></div>`;
+  }
+  return `<div class="report-section"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><strong>${t('report_h')} · ${t('report_full')}</strong><span class="badge">${label}</span></div><ul style="margin:8px 0 0 18px"><li>学生条件与通道说明</li><li>三档院校清单 + 匹配解释</li><li>反事实推演与提分路径</li><li>课程资源推荐（按优先级）</li><li>风险项与人工复核建议</li><li>可执行行动清单（周计划）</li></ul><div style="margin-top:10px"><button class="btn btn-primary" onclick="window.print()">${t('print')}</button></div></div>`;
+}
 
 function renderIndex(){
   const app=document.getElementById('app');
   const pOpts=t('province_opts').map(v=>`<option ${form.domestic.province===v?'selected':''}>${v}</option>`).join('');
   const lOpts=t('level_opts').map(([v,l])=>`<option value="${v}" ${form.domestic.level===v?'selected':''}>${l}</option>`).join('');
   const cOpts=t('country_opts').map(([v,l])=>`<option value="${v}" ${form.overseas.country===v?'selected':''}>${l}</option>`).join('');
-  app.innerHTML=`<section class="hero"><div class="card"><h1>${t('h1')}</h1><div class="sub">${t('sub')}</div><div class="tabs" style="margin-top:16px"><div class="tab ${form.track==='domestic'?'active':''}" id="tabD">${t('tab_domestic')}</div><div class="tab ${form.track==='overseas'?'active':''}" id="tabO">${t('tab_overseas')}</div></div><div id="dBox"><div class="grid2"><div><label>${t('province')}</label><select id="province">${pOpts}</select></div><div><label>${t('level')}</label><select id="level">${lOpts}</select></div><div><label>${t('score')}</label><input id="score" type="number" min="300" max="750" value="${form.domestic.score}"/></div><div><label>${t('rank')}</label><input id="rank" value="${form.domestic.rank}"/></div></div><div id="policyBox" style="margin-top:14px">${policyPreviewHtml(form.domestic.province, form.domestic.score)}</div></div><div id="oBox"><div class="grid2"><div><label>${t('gpa')}</label><input id="gpa" type="number" step="0.1" min="0" max="4" value="${form.overseas.gpa}"/></div><div><label>${t('ielts')}</label><input id="ielts" type="number" step="0.5" min="0" max="9" value="${form.overseas.ielts}"/></div><div><label>${t('country')}</label><select id="country">${cOpts}</select></div></div></div><div class="gdpr" style="margin-top:14px"><label style="display:flex;gap:12px;align-items:flex-start"><input type="checkbox" checked /><span>${t('gdpr')}</span></label></div><div style="margin-top:16px"><button class="submit-btn" id="go">${t('submit')}</button></div></div><div class="card"><strong>院校样本</strong><div class="small" style="margin-top:8px">Tsinghua · PKU · Fudan · SJTU · ZJU · SYSU · WHU · HUST · HKU · HKUST · NUS · NTU · Harvard · Stanford · Oxford · LSE · Sydney · UNSW</div></div></section>`;
-  const toggle=()=>{document.getElementById('dBox').style.display=form.track==='domestic'?'block':'none';document.getElementById('oBox').style.display=form.track==='overseas'?'block':'none';};toggle();
+
+  app.innerHTML=`
+  <section class="hero">
+    <div class="card">
+      <h1>${t('h1')}</h1>
+      <div class="sub">${t('sub')}</div>
+      <div class="tabs" style="margin-top:16px"><div class="tab ${form.track==='domestic'?'active':''}" id="tabD">${t('tab_domestic')}</div><div class="tab ${form.track==='overseas'?'active':''}" id="tabO">${t('tab_overseas')}</div></div>
+      <div id="dBox"><div class="grid2">
+        <div><label>${t('province')}</label><select id="province">${pOpts}</select></div>
+        <div><label>${t('level')}</label><select id="level">${lOpts}</select></div>
+        <div><label>${t('score')}</label><input id="score" type="number" min="300" max="750" value="${form.domestic.score}"/></div>
+        <div><label>${t('rank')}</label><input id="rank" value="${form.domestic.rank}"/></div>
+      </div></div>
+      <div id="oBox"><div class="grid2">
+        <div><label>${t('gpa')}</label><input id="gpa" type="number" step="0.1" min="0" max="4" value="${form.overseas.gpa}"/></div>
+        <div><label>${t('ielts')}</label><input id="ielts" type="number" step="0.5" min="0" max="9" value="${form.overseas.ielts}"/></div>
+        <div><label>${t('country')}</label><select id="country">${cOpts}</select></div>
+      </div></div>
+      <div class="gdpr" style="margin-top:14px"><label style="display:flex;gap:12px;align-items:flex-start"><input type="checkbox" checked /><span>${t('gdpr')}</span></label></div>
+      <div style="margin-top:16px"><button class="submit-btn" id="go">${t('submit')}</button></div>
+    </div>
+    <div class="card"><strong>${t('sample_title')}</strong><div class="small" style="margin-top:8px">${t('sample_hint')}</div><div class="small" style="margin-top:8px">Tsinghua · PKU · Fudan · SJTU · ZJU · HKU · HKUST · NUS · NTU · Harvard · Stanford · Oxford · LSE · Sydney · UNSW</div></div>
+  </section>`;
+
+  const toggle=()=>{document.getElementById('dBox').style.display=form.track==='domestic'?'block':'none';document.getElementById('oBox').style.display=form.track==='overseas'?'block':'none';};
+  toggle();
   document.getElementById('tabD').onclick=()=>{form.track='domestic';toggle();document.getElementById('tabD').classList.add('active');document.getElementById('tabO').classList.remove('active');};
   document.getElementById('tabO').onclick=()=>{form.track='overseas';toggle();document.getElementById('tabO').classList.add('active');document.getElementById('tabD').classList.remove('active');};
-  document.getElementById('province').onchange=()=>{form.domestic.province=document.getElementById('province').value;document.getElementById('policyBox').innerHTML=policyPreviewHtml(form.domestic.province, Number(document.getElementById('score').value||form.domestic.score));};
-  document.getElementById('score').oninput=()=>{document.getElementById('policyBox').innerHTML=policyPreviewHtml(form.domestic.province, Number(document.getElementById('score').value||0));};
-  document.getElementById('go').onclick=()=>{form.domestic.province=document.getElementById('province').value;form.domestic.level=document.getElementById('level').value;form.domestic.score=Number(document.getElementById('score').value);form.domestic.rank=document.getElementById('rank').value;form.overseas.gpa=Number(document.getElementById('gpa').value);form.overseas.ielts=Number(document.getElementById('ielts').value);form.overseas.country=document.getElementById('country').value;location.hash='#/result';};
+  document.getElementById('go').onclick=()=>{
+    form.domestic.province=document.getElementById('province').value;form.domestic.level=document.getElementById('level').value;form.domestic.score=Number(document.getElementById('score').value);form.domestic.rank=document.getElementById('rank').value;
+    form.overseas.gpa=Number(document.getElementById('gpa').value);form.overseas.ielts=Number(document.getElementById('ielts').value);form.overseas.country=document.getElementById('country').value;
+    location.hash='#/result';
+  };
 }
 
 function renderResult(){
-  const app=document.getElementById('app');const labels=t('cat');let info='',counter='',policyHtml='',cards='';
+  const app=document.getElementById('app');
+  const tier=getTier();const labels=t('cat');let info='',counter='',cards='',policyHtml='',resourceCards='';
   if(form.track==='domestic'){
-    const {province,score,rank,level}=form.domestic;const rec=recommendDomestic(score,level);const g=balance(rec.g);
-    info=`${t('info_student')}｜${t('info_province')}：<strong>${province}</strong>｜${t('info_score')}：<strong>${score}</strong>${rank?`｜${t('info_rank')}：<strong>${rank}</strong>`:''}`;
+    const {province,score,rank,level}=form.domestic;const providedRank = rank!=='' && !Number.isNaN(Number(rank)) ? Number(rank) : null;const rec=recommendDomestic(score,providedRank,level);const g=balance(rec.g);const displayRank=rec.rank!=null?rec.rank:'-';const policyHtml=policySection(province,score);const resourceCards=scoreResourceCards(score);
+    lastResult={track:'domestic',form:{...form.domestic},g};
+    info=`${t('info_student')}｜${t('info_province')}：<strong>${province}</strong>｜${t('info_score')}：<strong>${score}</strong>｜${t('info_rank')}：<strong>${displayRank}</strong>`;
     counter=`<div class="counter-banner fade-up"><div><div class="small">${t('counter_title')}</div><div style="margin-top:8px;font-size:18px">${t('counter_from')}：<strong>${score}</strong> → ${t('counter_to')}：<strong>${score+10}</strong></div></div><div style="text-align:center"><div class="big">${t('plus_h')}</div></div><div>${t('counter_text')}</div></div>`;
-    policyHtml=policyPreviewHtml(province,score);
-    cards=[0,1,2].map(i=>`<div style="display:flex;flex-direction:column;gap:14px">${g[i].map(u=>cardHtml(u,i,Math.max(12,u.matchScore))).join('')||'<div class="card small">-</div>'}</div>`).join('');
+    cards=[0,1,2].map(i=>`<div style="display:flex;flex-direction:column;gap:14px">${g[i].map(u=>cardHtml(u,i,Math.max(12,u.matchScore),tier)).join('')||'<div class="card small">-</div>'}</div>`).join('');
   } else {
     const {gpa,ielts,country}=form.overseas;const rec=recommendOverseas(gpa,ielts,country);const g=balance(rec.g);
+    policyHtml='';resourceCards='';
+    lastResult={track:'overseas',form:{...form.overseas},g};
     info=`${t('info_student')}｜${t('info_gpa')}：<strong>${gpa}</strong>｜${t('info_ielts')}：<strong>${ielts}</strong>｜${t('info_region')}：<strong>${country||'Any'}</strong>`;
     counter=`<div class="counter-banner fade-up"><div><div class="small">${t('counter_title')}</div><div style="margin-top:8px;font-size:18px">${t('counter_from')}：<strong>IELTS ${ielts.toFixed(1)}</strong> → ${t('counter_to')}：<strong>IELTS ${Math.min(9,ielts+1).toFixed(1)}</strong></div></div><div style="text-align:center"><div class="big">${t('plus_h')}</div></div><div>${t('counter_text')}</div></div>`;
-    cards=[0,1,2].map(i=>`<div style="display:flex;flex-direction:column;gap:14px">${g[i].map(u=>cardHtml(u,i,Math.max(12,u.matchScore))).join('')||'<div class="card small">-</div>'}</div>`).join('');
+    cards=[0,1,2].map(i=>`<div style="display:flex;flex-direction:column;gap:14px">${g[i].map(u=>cardHtml(u,i,Math.max(12,u.matchScore),tier)).join('')||'<div class="card small">-</div>'}</div>`).join('');
   }
-  app.innerHTML=`<div style="padding-top:22px" class="fade-up"><div class="info-bar"><div>${info}</div><div><span class="badge">${t('track_label')}：${form.track==='domestic'?t('domestic_label'):t('overseas_label')}</span></div></div><div style="margin-top:14px">${policyHtml}</div><div style="margin-top:14px">${counter}</div><div class="grid3" style="margin-top:16px;align-items:start">${cards}</div><div style="margin-top:16px;margin-bottom:8px"><a class="btn" href="#/">${t('back')}</a></div></div>`;
+  app.innerHTML=`
+    <div style="padding-top:22px" class="fade-up">
+      <div class="info-bar"><div>${info}</div><div><span class="badge">${t('track_label')}：${form.track==='domestic'?t('domestic_label'):t('overseas_label')}</span> <span class="badge">${lang==='zh'?'套餐':'Tier'}：${tier.toUpperCase()}</span></div></div>
+      <div style="margin-top:14px">${policyHtml}</div><div style="margin-top:14px">${counter}</div><div>${resourceCards}</div>
+      <div class="grid3" style="margin-top:16px;align-items:start">${cards}</div>
+      <div style="margin-top:18px">${reportHtml(form.track, tier)}</div>
+      <div style="margin-top:16px;margin-bottom:8px;display:flex;gap:12px"><a class="btn" href="#/">${t('back')}</a><a class="btn btn-accent" href="#/pricing">${lang==='zh'?'升级套餐':'Upgrade'}</a><a class="btn" href="#/resources">${lang==='zh'?'查看课程资源库':'View resource library'}</a></div>
+    </div>`;
 }
 
-function render(){document.getElementById('langZh').onclick=()=>{lang='zh';localStorage.setItem('edupath_lang','zh');render()};document.getElementById('langEn').onclick=()=>{lang='en';localStorage.setItem('edupath_lang','en');render()};const h=(location.hash||'#/').split('?')[0];if(h==='#/result')renderResult();else renderIndex();}
+function renderPricing(){document.getElementById('app').innerHTML=`<div style="padding-top:22px" class="fade-up"><h1>${t('pricing_h')}</h1><div class="sub">${t('pricing_sub')}</div><div style="margin-top:16px">${pricingHtml()}</div><div style="margin-top:16px"><a class="btn" href="#/">${t('back')}</a></div></div>`}
+function renderResources(){document.getElementById('app').innerHTML=resourcesPage();bindResEvents()}
+function bindResEvents(){const ids=['rq','rcat','rregion','rtier'];ids.forEach(id=>{const el=document.getElementById(id);if(!el)return;el.onchange=()=>{resFilter.q=document.getElementById('rq').value;resFilter.cat=document.getElementById('rcat').value;resFilter.region=document.getElementById('rregion').value;resFilter.tier=document.getElementById('rtier').value;renderResources()};if(id==='rq')el.oninput=el.onchange})}
+function renderAdminLogin(){document.getElementById('app').innerHTML=`<div style="padding-top:22px" class="fade-up"><h1>${t('admin_login')}</h1><div class="card" style="max-width:520px;margin-top:14px"><div><label>${t('pw')}</label><input id="pw" type="password" placeholder="admin2026"/></div><div style="display:flex;gap:12px;margin-top:14px"><button class="btn btn-primary" id="enter">${t('enter')}</button><a class="btn" href="#/">${t('back')}</a></div></div></div>`;document.getElementById('enter').onclick=()=>{if(document.getElementById('pw').value==='admin2026'){location.hash='#/admin'}else{alert(t('pw_err'))}}}
+
+function openEditor(u,type){
+  const app=document.getElementById('app');const v=(k)=>u?u[k]:'';
+  app.innerHTML=`<div style="padding-top:22px" class="fade-up"><h1>${t('add_title')}</h1><div class="card" style="margin-top:14px"><div class="grid2"><div><label>${t('name_zh')}</label><input id="e_name_zh" value="${esc(v('name_zh'))}"/></div><div><label>${t('name_en')}</label><input id="e_name_en" value="${esc(v('name_en'))}"/></div><div><label>${t('region')}</label><select id="e_region"><option value="mainland" ${v('region')==='mainland'?'selected':''}>mainland</option><option value="HK" ${v('region')==='HK'?'selected':''}>HK</option><option value="SG" ${v('region')==='SG'?'selected':''}>SG</option><option value="US" ${v('region')==='US'?'selected':''}>US</option><option value="UK" ${v('region')==='UK'?'selected':''}>UK</option><option value="AU" ${v('region')==='AU'?'selected':''}>AU</option></select></div><div><label>Country</label><select id="e_country"><option value="" ${!v('country')?'selected':''}>-</option><option value="HK" ${v('country')==='HK'?'selected':''}>HK</option><option value="SG" ${v('country')==='SG'?'selected':''}>SG</option><option value="US" ${v('country')==='US'?'selected':''}>US</option><option value="UK" ${v('country')==='UK'?'selected':''}>UK</option><option value="AU" ${v('country')==='AU'?'selected':''}>AU</option></select></div><div><label>${t('level')}</label><select id="e_level"><option value="985" ${v('level')==='985'?'selected':''}>985</option><option value="211" ${v('level')==='211'?'selected':''}>211</option><option value="-" ${v('level')==='-'?'selected':''}>-</option></select></div><div><label>${t('score_line')}</label><input id="e_score_line" type="number" value="${v('score_line')||''}"/></div><div><label>${t('rank_hint')}</label><input id="e_rank_hint" type="number" value="${v('rank_hint')||''}"/></div><div><label>${t('acceptance_rate')}</label><input id="e_ar" type="number" step="0.1" min="0" max="100" value="${v('acceptance_rate')||''}"/></div><div><label>${t('gpa_req')}</label><input id="e_gpa" type="number" step="0.1" min="0" max="4" value="${v('gpa')||''}"/></div><div><label>${t('ielts_req')}</label><input id="e_ielts" type="number" step="0.5" min="0" max="9" value="${v('ielts')||''}"/></div></div><div class="grid2" style="margin-top:12px"><div><label>${t('note_zh')}</label><input id="e_note_zh" value="${esc(v('note_zh'))}"/></div><div><label>${t('note_en')}</label><input id="e_note_en" value="${esc(v('note_en'))}"/></div></div><div style="display:flex;gap:12px;margin-top:16px"><button class="btn btn-primary" id="e_save">${t('save_btn')}</button><button class="btn" id="e_cancel">${t('cancel')}</button></div></div></div>`;
+  document.getElementById('e_cancel').onclick=()=>{location.hash='#/admin'};
+  document.getElementById('e_save').onclick=()=>{
+    const obj={id:u?u.id:document.getElementById('e_name_en').value.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'')||`id-${Date.now()}`,name_zh:document.getElementById('e_name_zh').value,name_en:document.getElementById('e_name_en').value,region:document.getElementById('e_region').value,country:document.getElementById('e_country').value,level:document.getElementById('e_level').value,score_line:Number(document.getElementById('e_score_line').value),rank_hint:Number(document.getElementById('e_rank_hint').value),acceptance_rate:Number(document.getElementById('e_ar').value),gpa:Number(document.getElementById('e_gpa').value),ielts:Number(document.getElementById('e_ielts').value),note_zh:document.getElementById('e_note_zh').value,note_en:document.getElementById('e_note_en').value};
+    if(u){const arr=obj.region==='mainland'?DB.domestic:DB.overseas;const idx=arr.findIndex(x=>x.id===u.id);if(idx>=0)arr[idx]=obj;const other=obj.region==='mainland'?DB.overseas:DB.domestic;const j=other.findIndex(x=>x.id===u.id);if(j>=0)other.splice(j,1);}else{if(obj.region==='mainland'){DB.domestic.push(obj)}else{DB.overseas.push(obj)}}
+    saveAll(DB);alert(t('saved'));location.hash='#/admin';
+  };
+}
+
+function renderAdmin(){
+  function tableHtml(arr,type){return `<div class="table-wrap"><table><thead><tr><th>ID</th><th>${t('name_zh')}</th><th>${t('name_en')}</th><th>${t('region')}</th><th>${t('level')}</th><th>${t('score_line')}</th><th>${t('gpa_req')}</th><th>${t('ielts_req')}</th><th>${t('acceptance_rate')}</th><th>Actions</th></tr></thead><tbody>${arr.map(u=>`<tr><td>${u.id}</td><td>${uname(u)}</td><td>${u.name_en}</td><td>${u.region}</td><td>${u.level||'-'}</td><td>${u.score_line||''}</td><td>${u.gpa||''}</td><td>${u.ielts||''}</td><td>${u.acceptance_rate||''}</td><td style="white-space:nowrap"><button class="btn" onclick="location.hash='#/edit/${type}/${u.id}'">${t('edit')}</button> <button class="btn" onclick="if(confirm('${t('confirm_del')}')){deleteItem('${type}','${u.id}')}">${t('del')}</button></td></tr>`).join('')}</tbody></table></div>`}
+  document.getElementById('app').innerHTML=`<div style="padding-top:22px" class="fade-up"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px"><h1 style="margin:0">${t('admin_h')}</h1><div style="display:flex;gap:10px"><a class="btn btn-primary" href="#/add">${t('add')}</a><button class="btn" id="resetBtn">${t('reset')}</button><a class="btn" href="#/">${t('back')}</a></div></div><div class="small" style="margin-top:8px">${t('admin_hint')}</div><h2 style="margin-top:16px">${t('table_domestic')}</h2>${tableHtml(DB.domestic,'domestic')}<h2 style="margin-top:16px">${t('table_overseas')}</h2>${tableHtml(DB.overseas,'overseas')}</div>`;
+  document.getElementById('resetBtn').onclick=()=>{if(confirm('Reset to default?'))resetAll()};
+}
+
+window.deleteItem=function(type,id){if(type==='domestic'){DB.domestic=DB.domestic.filter(u=>u.id!==id)}else{DB.overseas=DB.overseas.filter(u=>u.id!==id)}saveAll(DB);render()};
+
+function render(){
+  document.getElementById('langZh').onclick=()=>{lang='zh';localStorage.setItem('edupath_lang','zh');render()};
+  document.getElementById('langEn').onclick=()=>{lang='en';localStorage.setItem('edupath_lang','en');render()};
+  document.getElementById('footText').textContent=t('foot');
+  document.getElementById('pricingLink').textContent=lang==='zh'?'⭐ 套餐':'⭐ Packages';
+  document.getElementById('resLink').textContent=lang==='zh'?'📚 课程资源库':'📚 Resources';
+  document.getElementById('adminLink').textContent='⚙️ '+(lang==='zh'?'后台':'Admin');
+  const h=(location.hash||'#/').split('?')[0];
+  if(h==='#/result')renderResult();
+  else if(h==='#/pricing')renderPricing();
+  else if(h==='#/resources')renderResources();
+  else if(h==='#/admin-login')renderAdminLogin();
+  else if(h==='#/admin')renderAdmin();
+  else if(h==='#/add')openEditor(null,'domestic');
+  else if(h.startsWith('#/edit/')){const[,,type,id]=h.split('/');const u=(type==='domestic'?DB.domestic:DB.overseas).find(x=>x.id===id)||null;openEditor(u,type)}
+  else renderIndex();
+}
 window.addEventListener('hashchange',render);render();
 </script>
 </body>
